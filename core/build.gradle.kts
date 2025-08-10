@@ -3,7 +3,6 @@ import net.kyori.blossom.BlossomExtension
 plugins {
     // Allow blossom to mark sources root of templates
     idea
-    alias(libs.plugins.blossom)
     id("geyser.publish-conventions")
     id("io.freefair.lombok")
 }
