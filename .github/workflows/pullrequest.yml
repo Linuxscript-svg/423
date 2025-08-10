@@ -17,49 +17,6 @@ jobs:
           distribution: temurin
           cache: gradle
 
-      # 仅PR事件需要检查fork
-      - name: Check if the author has forked the API repo (PR only)
-        if: ${{ github.event_name == 'pull_request' }}
-        uses: Kas-tle/ForkFinder@v1.0.1
-        id: find_forks
-        with:
-          owner: GeyserMC
-          repo: api
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      # 处理API依赖 - 三种情况
-      - name: Use author's API fork (PR with fork)
-        if: ${{ github.event_name == 'pull_request' && steps.find_forks.outputs.target_branch_found == 'true' }}
-        env:
-          API_FORK_URL: ${{ steps.find_forks.outputs.user_fork_url }}
-          API_FORK_BRANCH: ${{ github.event.pull_request.head.ref }}
-        run: |
-          git clone "${API_FORK_URL}" --single-branch --branch "${API_FORK_BRANCH}" api
-          cd api
-          ./gradlew publishToMavenLocal
-
-      - name: Use main API repo (PR without fork)
-        if: ${{ github.event_name == 'pull_request' && steps.find_forks.outputs.target_branch_found != 'true' }}
-        run: |
-          git clone https://github.com/GeyserMC/api.git --single-branch --branch main api
-          cd api
-          ./gradlew publishToMavenLocal
-
-      - name: Use main API repo (Push to main)
-        if: ${{ github.event_name == 'push' }}
-        run: |
-          git clone https://github.com/GeyserMC/api.git --single-branch --branch main api
-          cd api
-          ./gradlew publishToMavenLocal
-
-      - name: Checkout repository and submodules
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
-          path: geyser
-          # 针对push事件使用当前提交
-          ref: ${{ github.event_name == 'push' && github.sha || github.event.pull_request.head.sha }}
-
       - name: Build Geyser
         uses: gradle/gradle-build-action@v2
         with:
