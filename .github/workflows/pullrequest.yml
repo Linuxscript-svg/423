@@ -18,11 +18,7 @@ jobs:
           cache: gradle
 
       - name: Build Geyser
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: build
-          build-root-directory: geyser
-
+        run: ./gradlew jar
       # 以下artifact上传步骤保持不变...
       - name: Archive artifacts (Geyser Fabric)
         uses: actions/upload-artifact@v4
