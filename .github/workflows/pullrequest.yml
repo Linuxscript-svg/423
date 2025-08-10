@@ -1,6 +1,6 @@
 name: Build Pull Request
 
-on: [main]
+on: [pull_request]
 
 jobs:
   build:
